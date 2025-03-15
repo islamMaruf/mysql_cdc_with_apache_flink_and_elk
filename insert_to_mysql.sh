@@ -33,20 +33,6 @@ fi
 
 echo "MySQL SQL script executed successfully!"
 
-# Copy the CQL file to the Cassandra Docker container
-echo "Copying CQL file to Cassandra Docker container..."
-docker cp "$LOCAL_CASSANDRA_CQL_FILE" "$CASSANDRA_CONTAINER_NAME:$DOCKER_CASSANDRA_CQL_PATH"
-
-# Check if the copy was successful
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to copy CQL file to Cassandra Docker container."
-  exit 1
-fi
-
-# Execute the CQL script inside the Cassandra Docker container
-echo "Executing CQL script in Cassandra Docker container..."
-docker exec -i "$CASSANDRA_CONTAINER_NAME" cqlsh -u cassandra -p cassandra -f "$DOCKER_CASSANDRA_CQL_PATH"
-
 # Check if the CQL execution was successful
 if [ $? -ne 0 ]; then
   echo "Error: Failed to execute CQL script in Cassandra Docker container."
