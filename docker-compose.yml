@@ -90,21 +90,6 @@ services:
     networks:
       - flink-network
 
-  cassandra:
-    image: cassandra:4.0
-    container_name: cassandra
-    ports:
-      - "9042:9042"  # CQL port
-    environment:
-      - CASSANDRA_CLUSTER_NAME=flink-cluster
-    healthcheck:
-      test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra", "-e 'DESCRIBE KEYSPACES'"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    networks:
-      - flink-network
-
 networks:
   flink-network:
     driver: bridge

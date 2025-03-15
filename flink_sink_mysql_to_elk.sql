@@ -50,40 +50,8 @@ CREATE TABLE elasticsearch_orders (
     'index' = 'enriched_orders'
 );
 
--- Create Cassandra Sink Table for 'enriched_orders'
-CREATE TABLE cassandra_orders (
-    order_id INT,
-    order_date TIMESTAMP(0),
-    customer_name STRING,
-    price DECIMAL(10, 5),
-    product_id INT,
-    order_status BOOLEAN,
-    product_name STRING,
-    product_description STRING,
-    PRIMARY KEY (order_id) NOT ENFORCED
-) WITH (
-    'connector' = 'cassandra',
-    'hosts' = 'cassandra:9042',
-    'table-name' = 'enriched_orders',
-    'keyspace' = 'flink_ks'
-);
-
 -- Insert enriched data into Elasticsearch
 INSERT INTO elasticsearch_orders
-SELECT
-    o.order_id,
-    o.order_date,
-    o.customer_name,
-    o.price,
-    o.product_id,
-    o.order_status,
-    p.name AS product_name,
-    p.description AS product_description
-FROM mysql_orders AS o
-LEFT JOIN mysql_products AS p ON o.product_id = p.id;
-
--- Insert enriched data into Cassandra
-INSERT INTO cassandra_orders
 SELECT
     o.order_id,
     o.order_date,
