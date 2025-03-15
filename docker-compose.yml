@@ -1,0 +1,96 @@
+version: "3.8"
+
+services:
+  # Flink JobManager
+  jobmanager:
+    build: .
+    container_name: flink-jobmanager
+    ports:
+      - "8082:8081"
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    volumes:
+      - ./flink-logs:/opt/flink/log  # Mount a local directory for logs
+    command: jobmanager
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - flink-network
+
+  # Flink TaskManager
+  taskmanager:
+    build: .
+    container_name: flink-taskmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    volumes:
+      - ./flink-logs:/opt/flink/log  # Mount a local directory for logs
+    networks:
+      - flink-network
+
+  # MySQL CDC (Debezium Example MySQL)
+  mysql:
+    image: debezium/example-mysql:1.1
+    container_name: mysql-cdc
+    ports:
+      - "33080:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - flink-network
+
+  # Elasticsearch
+  elasticsearch:
+    image: elastic/elasticsearch:7.6.0
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - flink-network
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - flink-network
+
+networks:
+  flink-network:
+    driver: bridge
+    name: flink-network
