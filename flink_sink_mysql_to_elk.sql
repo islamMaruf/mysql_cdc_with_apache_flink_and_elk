@@ -1,4 +1,6 @@
 -- Create MySQL CDC Source Table for 'products'
+--SET execution.checkpointing.interval = 3s;
+
 CREATE TABLE mysql_products (
     id INT,
     name STRING,
