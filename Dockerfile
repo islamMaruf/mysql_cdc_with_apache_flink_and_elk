@@ -12,8 +12,10 @@ RUN wget -q -O /opt/flink/lib/flink-sql-connector-elasticsearch7-1.16.0.jar \
         https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-elasticsearch7/1.16.0/flink-sql-connector-elasticsearch7-1.16.0.jar && \
     wget -q -O /opt/flink/lib/flink-sql-connector-mysql-cdc-2.4.0.jar \
         https://repo1.maven.org/maven2/com/ververica/flink-sql-connector-mysql-cdc/2.4.0/flink-sql-connector-mysql-cdc-2.4.0.jar && \
-    chown flink:flink /opt/flink/lib/flink-sql-connector-*.jar && \
-    chmod 644 /opt/flink/lib/flink-sql-connector-*.jar
+    wget -q -O /opt/flink/lib/flink-connector-cassandra_2.12-1.16.0.jar \
+        https://repo1.maven.org/maven2/org/apache/flink/flink-connector-cassandra_2.12/1.16.0/flink-connector-cassandra_2.12-1.16.0.jar && \
+    chown flink:flink /opt/flink/lib/flink-*.jar && \
+    chmod 644 /opt/flink/lib/flink-*.jar
 
 # Expose Flink UI port
 EXPOSE 8081
