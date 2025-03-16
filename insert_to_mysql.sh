@@ -32,11 +32,3 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "MySQL SQL script executed successfully!"
-
-# Check if the CQL execution was successful
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to execute CQL script in Cassandra Docker container."
-  exit 1
-fi
-
-echo "Cassandra keyspace and table created successfully!"
